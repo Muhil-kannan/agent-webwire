@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "webpulse": {
+      "command": "webpulse",
+      "args": ["mcp", "start"]
+    }
+  }
+}
