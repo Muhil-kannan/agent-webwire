@@ -1,5 +1,8 @@
 # Authentication and provider access
 
+For setup steps and working command examples, see the
+[platform guide](PLATFORM_GUIDE.md).
+
 WebWire stores environment variable **names**, not secret values. Obtain
 credentials directly from each provider; use your shell or secret manager to
 inject them. No credentials go to a WebWire-operated server. Never put tokens

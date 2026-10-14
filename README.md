@@ -56,6 +56,9 @@ and the executable is `webwire`.
 
 ## Supported channels
 
+Start with the [platform setup and usage guide](docs/PLATFORM_GUIDE.md) for
+credential setup, copyable commands, and platform-specific limitations.
+
 | Channel   | Capabilities                                              | Authentication                                                              |
 | --------- | --------------------------------------------------------- | --------------------------------------------------------------------------- |
 | Web       | Public HTML/plain text, titles, metadata, Markdown        | None for public pages                                                       |
@@ -229,6 +232,8 @@ types, the CLI, and MCP stdio. CI targets Windows, Linux, and macOS on Node 22 a
 
 [Contributing](CONTRIBUTING.md) · [Architecture](docs/ARCHITECTURE.md) ·
 [Authentication](docs/AUTHENTICATION.md) · [Releasing](docs/RELEASING.md)
+
+[Platform setup and usage](docs/PLATFORM_GUIDE.md)
 
 ## License and credits
 
