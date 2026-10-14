@@ -26,7 +26,7 @@ export class DependencyManager {
           ? 'Executable or its interpreter is missing.'
           : 'Executable probe failed or timed out.',
         'Executable availability.',
-        'Install or repair the optional tool explicitly; WebPulse will not install system software.',
+        'Install or repair the optional tool explicitly; WebWire will not install system software.',
       );
     }
   }

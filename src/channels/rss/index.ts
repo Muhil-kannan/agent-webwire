@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { XMLParser, XMLValidator } from 'fast-xml-parser';
 import { apiChannel, operation, urlInput, type ChannelDependencies } from '../shared.js';
-import { WebPulseError } from '../../core/errors.js';
+import { WebWireError } from '../../core/errors.js';
 
 const entrySchema = z.object({
   id: z.string(),
@@ -67,7 +67,7 @@ function date(value: unknown): string | undefined {
 }
 export function parseFeed(xml: string, url: string, limit: number) {
   if (/<!\s*(?:DOCTYPE|ENTITY)/i.test(xml) || XMLValidator.validate(xml) !== true)
-    throw new WebPulseError(
+    throw new WebWireError(
       'INVALID_RESPONSE',
       'The feed is malformed or contains a forbidden XML declaration.',
     );
@@ -80,13 +80,13 @@ export function parseFeed(xml: string, url: string, limit: number) {
       trimValues: true,
     }).parse(xml) as unknown;
   } catch {
-    throw new WebPulseError('INVALID_RESPONSE', 'The XML feed could not be parsed.');
+    throw new WebWireError('INVALID_RESPONSE', 'The XML feed could not be parsed.');
   }
   const root = object(parsed);
   const atom = root.feed !== undefined;
   const feed = object(atom ? root.feed : object(root.rss).channel);
   if (!Object.keys(feed).length || !text(feed.title))
-    throw new WebPulseError('INVALID_RESPONSE', 'Expected an RSS 2.0 or Atom feed with a title.');
+    throw new WebWireError('INVALID_RESPONSE', 'Expected an RSS 2.0 or Atom feed with a title.');
   const entries = array(atom ? feed.entry : feed.item)
     .slice(0, limit)
     .map((raw) => {

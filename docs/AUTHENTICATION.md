@@ -1,10 +1,10 @@
 # Authentication and provider access
 
-WebPulse stores environment variable **names**, not secret values. Obtain
+WebWire stores environment variable **names**, not secret values. Obtain
 credentials directly from each provider; use your shell or secret manager to
-inject them. No credentials go to a WebPulse-operated server. Never put tokens
+inject them. No credentials go to a WebWire-operated server. Never put tokens
 in positional CLI arguments, source files, issue reports or committed client
-configuration. Existing OAuth access tokens are accepted; WebPulse does not
+configuration. Existing OAuth access tokens are accepted; WebWire does not
 perform browser login, token issuance or automatic refresh.
 
 | Channel / config auth key | Default environment name | Required access                                                                                                                                                                |
@@ -20,14 +20,14 @@ perform browser login, token issuance or automatic refresh.
 Example for a custom environment name:
 
 ```bash
-webpulse configure --auth github=WORK_GITHUB_TOKEN
+webwire configure --auth github=WORK_GITHUB_TOKEN
 ```
 
-Use `webpulse configure --show` to inspect settings; it never prints credential
+Use `webwire configure --show` to inspect settings; it never prints credential
 values. POSIX config directory/file creation uses 0700/0600. Windows relies on
 the user's profile ACLs. Symbolic-link path components are rejected. Existing
 shared directories do not receive new ACLs automatically; choose a private
-`WEBPULSE_CONFIG_DIR` if your OS profile configuration is unusual.
+`WEBWIRE_CONFIG_DIR` if your OS profile configuration is unusual.
 
 Read probes are documented per backend in doctor. A successful public GitHub
 repository fetch cannot prove a private-repo grant; a YouTube metadata fetch
@@ -54,9 +54,9 @@ promise or hardcoded rate quota is made. Confirm current requirements in the
 provider account before authorizing requests.
 
 Exa keyless MCP requires no sign-in, API key, local server or additional system
-tool. Queries go to `https://mcp.exa.ai/mcp` through WebPulse's guarded transport
+tool. Queries go to `https://mcp.exa.ai/mcp` through WebWire's guarded transport
 and the official MCP SDK. Setting the configured Exa key selects REST instead.
 Authentication failures, exhausted quota and network failures on a configured
 REST account do not fall back to anonymous access. To return to keyless mode,
-remove the Exa credential from the environment used to launch WebPulse.
+remove the Exa credential from the environment used to launch WebWire.
 See [Exa MCP authentication](https://exa.ai/docs/get-started/exa-mcp#authentication).

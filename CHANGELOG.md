@@ -2,6 +2,10 @@
 
 ## 0.1.0 — Unreleased
 
+- Renamed the project to WebWire, npm package `agent-webwire`, SDK class
+  `WebWire`, CLI `webwire`, and MCP tools `webwire_*`. Configuration now uses
+  `WEBWIRE_CONFIG_DIR` and the `webwire` directory under the OS configuration path.
+
 - Independent TypeScript SDK, Commander CLI and official MCP stdio server.
 - Public website extraction, GitHub REST, RSS/Atom and credential-gated
   official YouTube, Reddit, X and LinkedIn own-profile operations; V2EX API.

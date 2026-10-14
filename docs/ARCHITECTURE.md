@@ -1,4 +1,4 @@
-# WebPulse architecture
+# WebWire architecture
 
 One instance owns validated options, an HTTP client, channel registry,
 backend manager and capability manager. Channels contain operation schemas and
@@ -43,7 +43,7 @@ exposed through CLI or MCP. Plugins and injected transports are trusted code.
 Config stores only settings and environment variable names; it does not persist
 credential values. Reads/writes reject symlink path components, writes use
 private temporary files and atomic rename. Doctor/discovery never writes files.
-User configuration is loaded explicitly with WebPulse.fromConfig(); constructor
+User configuration is loaded explicitly with WebWire.fromConfig(); constructor
 options are deterministic and do not access user disk. CLI uses fromConfig.
 
 The README lists supported channels and their scope. Discovery never implies

@@ -2,17 +2,17 @@ import { setTimeout as delay } from 'node:timers/promises';
 import {
   BackendUnavailableError,
   ConfigurationError,
-  WebPulseError,
+  WebWireError,
   normalizeError,
   ValidationError,
 } from './errors.js';
 import type { Config } from './ConfigManager.js';
-import type { Backend, DiagnosticEvent, Operation, WebPulseChannel } from './types.js';
+import type { Backend, DiagnosticEvent, Operation, WebWireChannel } from './types.js';
 
-export function abortError(signal: AbortSignal): WebPulseError {
+export function abortError(signal: AbortSignal): WebWireError {
   return signal.reason instanceof DOMException && signal.reason.name === 'TimeoutError'
-    ? new WebPulseError('TIMEOUT', 'The operation deadline expired.', { recoverable: true })
-    : new WebPulseError('CANCELLED', 'The operation was cancelled.');
+    ? new WebWireError('TIMEOUT', 'The operation deadline expired.', { recoverable: true })
+    : new WebWireError('CANCELLED', 'The operation was cancelled.');
 }
 /** Enforces cancellation even for plugins that fail to observe their signal. */
 export async function abortable<T>(work: () => Promise<T>, signal: AbortSignal): Promise<T> {
@@ -31,7 +31,7 @@ export async function abortable<T>(work: () => Promise<T>, signal: AbortSignal):
     if (listener) signal.removeEventListener('abort', listener);
   }
 }
-const transient = (error: WebPulseError) =>
+const transient = (error: WebWireError) =>
   ['NETWORK', 'TIMEOUT', 'BACKEND_UNAVAILABLE'].includes(error.code) &&
   error.details.recoverable === true;
 
@@ -40,7 +40,7 @@ export class BackendManager {
     private readonly config: Config,
     private readonly emit: (event: DiagnosticEvent) => void = () => {},
   ) {}
-  ordered(channel: WebPulseChannel, operation: string): Backend[] {
+  ordered(channel: WebWireChannel, operation: string): Backend[] {
     const preferred = this.config.preferredBackends[channel.id];
     if (preferred && !channel.backends.some((backend) => backend.id === preferred))
       throw new ConfigurationError(`Unknown preferred backend for ${channel.id}.`);
@@ -51,7 +51,7 @@ export class BackendManager {
       );
   }
   async execute(
-    channel: WebPulseChannel,
+    channel: WebWireChannel,
     operation: string,
     params: unknown,
     spec: Operation,
@@ -62,7 +62,7 @@ export class BackendManager {
       throw new ValidationError(`Invalid parameters for ${channel.id}.${operation}.`, {
         channel: channel.id,
       });
-    let last: WebPulseError | undefined;
+    let last: WebWireError | undefined;
     for (const backend of this.ordered(channel, operation)) {
       let available: boolean;
       const started = performance.now();
@@ -105,7 +105,7 @@ export class BackendManager {
           );
           const result = spec.output.safeParse(raw);
           if (!result.success)
-            throw new WebPulseError(
+            throw new WebWireError(
               'INVALID_RESPONSE',
               'The provider returned an unexpected response schema.',
             );
@@ -145,7 +145,7 @@ export class BackendManager {
       last ??
       new BackendUnavailableError(`No configured backend supports ${channel.id}.${operation}.`, {
         channel: channel.id,
-        suggestedAction: 'Run webpulse doctor and configure the required environment variables.',
+        suggestedAction: 'Run webwire doctor and configure the required environment variables.',
       })
     );
   }

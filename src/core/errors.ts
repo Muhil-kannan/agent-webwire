@@ -22,8 +22,8 @@ export interface ErrorDetails {
   suggestedAction?: string;
   retryAfterMs?: number;
 }
-export class WebPulseError extends Error {
-  override readonly name: string = 'WebPulseError';
+export class WebWireError extends Error {
+  override readonly name: string = 'WebWireError';
   constructor(
     public readonly code: ErrorCode,
     message: string,
@@ -35,7 +35,7 @@ export class WebPulseError extends Error {
     return { code: this.code, message: this.message, recoverable: false, ...this.details };
   }
 }
-export class AuthenticationError extends WebPulseError {
+export class AuthenticationError extends WebWireError {
   constructor(message = 'Authentication or permission check failed.', details: ErrorDetails = {}) {
     super('AUTHENTICATION', message, {
       suggestedAction: 'Check the configured credential, scopes and platform access grant.',
@@ -43,7 +43,7 @@ export class AuthenticationError extends WebPulseError {
     });
   }
 }
-export class RateLimitError extends WebPulseError {
+export class RateLimitError extends WebWireError {
   constructor(
     message = 'The provider rate limit or quota was reached.',
     details: ErrorDetails = {},
@@ -54,37 +54,37 @@ export class RateLimitError extends WebPulseError {
     });
   }
 }
-export class BackendUnavailableError extends WebPulseError {
+export class BackendUnavailableError extends WebWireError {
   constructor(message = 'No compatible backend is available.', details: ErrorDetails = {}) {
     super('BACKEND_UNAVAILABLE', message, { recoverable: true, ...details });
   }
 }
-export class ChannelUnavailableError extends WebPulseError {
+export class ChannelUnavailableError extends WebWireError {
   constructor(message: string, details: ErrorDetails = {}) {
     super('CHANNEL_UNAVAILABLE', message, details);
   }
 }
-export class ConfigurationError extends WebPulseError {
+export class ConfigurationError extends WebWireError {
   constructor(message: string) {
     super('CONFIGURATION', message, {
-      suggestedAction: 'Review configuration and run webpulse channels list.',
+      suggestedAction: 'Review configuration and run webwire channels list.',
     });
   }
 }
-export class NetworkError extends WebPulseError {
+export class NetworkError extends WebWireError {
   constructor(message = 'The network request failed.', details: ErrorDetails = {}) {
     super('NETWORK', message, { recoverable: true, ...details });
   }
 }
-export class ValidationError extends WebPulseError {
+export class ValidationError extends WebWireError {
   constructor(message: string, details: ErrorDetails = {}) {
     super('VALIDATION', message, details);
   }
 }
-export function normalizeError(error: unknown): WebPulseError {
-  return error instanceof WebPulseError
+export function normalizeError(error: unknown): WebWireError {
+  return error instanceof WebWireError
     ? error
-    : new WebPulseError('INTERNAL', 'An unexpected operation failure occurred.');
+    : new WebWireError('INTERNAL', 'An unexpected operation failure occurred.');
 }
 export function publicError(error: unknown, redactor = new Redactor()) {
   return redactor.value(normalizeError(error).toJSON());

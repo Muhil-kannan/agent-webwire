@@ -1,6 +1,6 @@
-import { WebPulse } from 'web-pulse';
+import { WebWire } from 'agent-webwire';
 
-const pulse = new WebPulse({ timeout: 15000, retries: 1 });
+const pulse = new WebWire({ timeout: 15000, retries: 1 });
 try {
   const page = await pulse.web.read('https://example.com');
   console.log(page.title, page.markdown);

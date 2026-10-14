@@ -6,7 +6,7 @@ import {
   urlInput,
   type ChannelDependencies,
 } from '../shared.js';
-import { AuthenticationError, WebPulseError, ValidationError } from '../../core/errors.js';
+import { AuthenticationError, WebWireError, ValidationError } from '../../core/errors.js';
 
 const snippetSchema = z.object({
   title: z.string(),
@@ -79,7 +79,7 @@ export function videoId(value: string): string {
 }
 export function parseVtt(vtt: string) {
   if (!vtt.trimStart().startsWith('WEBVTT'))
-    throw new WebPulseError('INVALID_RESPONSE', 'Expected a WebVTT caption response.');
+    throw new WebWireError('INVALID_RESPONSE', 'Expected a WebVTT caption response.');
   const seconds = (value: string) =>
     value.split(':').reduce((total, component) => total * 60 + Number(component), 0);
   const segments: z.output<typeof segmentSchema>[] = [];
@@ -91,10 +91,10 @@ export function parseVtt(vtt: string) {
       lines[index] ?? '',
     );
     if (!match?.[1] || !match[2])
-      throw new WebPulseError('INVALID_RESPONSE', 'Malformed WebVTT timestamps.');
+      throw new WebWireError('INVALID_RESPONSE', 'Malformed WebVTT timestamps.');
     const start = seconds(match[1]);
     const end = seconds(match[2]);
-    if (end < start) throw new WebPulseError('INVALID_RESPONSE', 'Malformed WebVTT cue duration.');
+    if (end < start) throw new WebWireError('INVALID_RESPONSE', 'Malformed WebVTT cue duration.');
     const text = lines
       .slice(index + 1)
       .join(' ')
@@ -106,7 +106,7 @@ export function parseVtt(vtt: string) {
       .trim();
     if (text) segments.push({ start, duration: end - start, text });
   }
-  if (!segments.length) throw new WebPulseError('NOT_FOUND', 'No caption cues were available.');
+  if (!segments.length) throw new WebWireError('NOT_FOUND', 'No caption cues were available.');
   return segments;
 }
 export function createYoutubeChannel({ http, credentials }: ChannelDependencies) {
@@ -170,7 +170,7 @@ export function createYoutubeChannel({ http, credentials }: ChannelDependencies)
           signal,
         );
         if (!result.items[0])
-          throw new WebPulseError('NOT_FOUND', 'The video is unavailable to this identity.');
+          throw new WebWireError('NOT_FOUND', 'The video is unavailable to this identity.');
         return result.items[0];
       }
       const p = youtubeOperations.getTranscript.input.parse(raw);
@@ -193,7 +193,7 @@ export function createYoutubeChannel({ http, credentials }: ChannelDependencies)
         (item) => item.snippet.language === p.language && item.snippet.status !== 'failed',
       );
       if (!track)
-        throw new WebPulseError(
+        throw new WebWireError(
           'NOT_FOUND',
           'No accessible caption track matched the requested language.',
         );

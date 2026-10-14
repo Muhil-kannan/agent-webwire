@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { operation, queryInput, type ChannelDependencies } from '../shared.js';
 import { searchExaMcp, searchResponseSchema } from '../../backends/mcp/ExaSearch.js';
-import { health, type WebPulseChannel } from '../../core/types.js';
+import { health, type WebWireChannel } from '../../core/types.js';
 
 export const searchOperations = {
   web: operation(
@@ -10,7 +10,7 @@ export const searchOperations = {
     searchResponseSchema,
   ),
 };
-export function createSearchChannel({ http, credentials }: ChannelDependencies): WebPulseChannel {
+export function createSearchChannel({ http, credentials }: ChannelDependencies): WebWireChannel {
   const hasKey = () => Boolean(credentials.get('search', 'EXA_API_KEY'));
   const search = async (query: string, limit: number, signal: AbortSignal) => {
     const result = await http.json(

@@ -2,7 +2,7 @@
 
 ## Network and content boundaries
 
-WebPulse accepts public HTTP(S) URLs on standard ports. The default transport
+WebWire accepts public HTTP(S) URLs on standard ports. The default transport
 rejects private, loopback, link-local, reserved, and metadata addresses, validates
 DNS answers inside the connection lookup, and checks every redirect. Standard
 NAT64 addresses are checked against their embedded IPv4 destination.

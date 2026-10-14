@@ -1,9 +1,9 @@
 import { ChannelUnavailableError, ConfigurationError, ValidationError } from './errors.js';
-import type { WebPulseChannel } from './types.js';
+import type { WebWireChannel } from './types.js';
 
 export class ChannelRegistry {
-  private readonly channels = new Map<string, WebPulseChannel>();
-  register(channel: WebPulseChannel): void {
+  private readonly channels = new Map<string, WebWireChannel>();
+  register(channel: WebWireChannel): void {
     if (!/^[a-z][a-z0-9_]*$/.test(channel.id) || this.channels.has(channel.id))
       throw new ConfigurationError(`Invalid or duplicate channel: ${channel.id}`);
     if (!Object.keys(channel.operations).length || !channel.backends.length)
@@ -20,13 +20,13 @@ export class ChannelRegistry {
     }
     this.channels.set(channel.id, channel);
   }
-  get(id: string): WebPulseChannel {
+  get(id: string): WebWireChannel {
     const channel = this.channels.get(id);
     if (!channel)
       throw new ChannelUnavailableError(`Channel '${id}' is not implemented or registered.`, {
         channel: id,
         suggestedAction:
-          'Run webpulse channels list and review the supported channels in README.md.',
+          'Run webwire channels list and review the supported channels in README.md.',
       });
     return channel;
   }
@@ -35,7 +35,7 @@ export class ChannelRegistry {
     if (!result) throw new ValidationError(`Unknown operation '${operation}'.`, { channel });
     return result;
   }
-  list(): WebPulseChannel[] {
+  list(): WebWireChannel[] {
     return [...this.channels.values()];
   }
 }

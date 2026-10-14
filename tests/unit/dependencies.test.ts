@@ -9,9 +9,7 @@ describe('optional subprocess probes', () => {
   });
   it('distinguishes missing executables from a failed process without printing stderr', async () => {
     const manager = new DependencyManager();
-    expect((await manager.probe('webpulse-no-such-executable-52d932')).message).toContain(
-      'missing',
-    );
+    expect((await manager.probe('webwire-no-such-executable-52d932')).message).toContain('missing');
     const result = await manager.probe(process.execPath, [
       '-e',
       'process.stderr.write("secret"); process.exit(1)',

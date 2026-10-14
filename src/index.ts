@@ -1,11 +1,11 @@
-export { WebPulse } from './core/WebPulse.js';
+export { WebWire } from './core/WebWire.js';
 export type {
-  WebPulseOptions,
+  WebWireOptions,
   BuiltinChannel,
   BuiltinOperation,
   OperationInput,
   OperationOutput,
-} from './core/WebPulse.js';
+} from './core/WebWire.js';
 export { ChannelRegistry } from './core/ChannelRegistry.js';
 export { BackendManager } from './core/BackendManager.js';
 export { CapabilityManager } from './core/CapabilityManager.js';

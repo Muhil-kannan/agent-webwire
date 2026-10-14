@@ -2,11 +2,11 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { createMcpServer } from '../../src/mcp/server.js';
-import { WebPulse } from '../../src/index.js';
+import { WebWire } from '../../src/index.js';
 import { repository } from '../fixtures/data.js';
 
 const sessions: Array<{ client: Client; server: ReturnType<typeof createMcpServer> }> = [];
-async function connect(pulse: WebPulse) {
+async function connect(pulse: WebWire) {
   const server = createMcpServer(pulse);
   const client = new Client({ name: 'test-client', version: '1.0.0' });
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
@@ -28,16 +28,16 @@ describe('official MCP protocol', () => {
     const fetch = vi
       .fn<typeof globalThis.fetch>()
       .mockImplementation(async () => Response.json(repository));
-    const client = await connect(new WebPulse({ http: { fetch }, env: {} }));
+    const client = await connect(new WebWire({ http: { fetch }, env: {} }));
     const tools = await client.listTools();
     expect(
-      tools.tools.find((tool) => tool.name === 'webpulse_youtube_transcript')?.description,
+      tools.tools.find((tool) => tool.name === 'webwire_youtube_transcript')?.description,
     ).toContain('can edit');
     expect(
-      tools.tools.find((tool) => tool.name === 'webpulse_github_search')?.inputSchema.properties,
+      tools.tools.find((tool) => tool.name === 'webwire_github_search')?.inputSchema.properties,
     ).toHaveProperty('query');
     const result = await client.callTool({
-      name: 'webpulse_github_repository',
+      name: 'webwire_github_repository',
       arguments: { owner: 'octocat', repo: 'Hello-World' },
     });
     expect(result.isError).not.toBe(true);
@@ -45,15 +45,15 @@ describe('official MCP protocol', () => {
   });
   it('rejects invalid inputs and unsafe URLs without network access', async () => {
     const fetch = vi.fn<typeof globalThis.fetch>();
-    const client = await connect(new WebPulse({ http: { fetch }, env: {} }));
+    const client = await connect(new WebWire({ http: { fetch }, env: {} }));
     await client.listTools();
     const invalid = await client.callTool({
-      name: 'webpulse_github_repository',
+      name: 'webwire_github_repository',
       arguments: { owner: '../escape', repo: 'repo' },
     });
     expect(invalid.isError).toBe(true);
     const unsafe = await client.callTool({
-      name: 'webpulse_web_read',
+      name: 'webwire_web_read',
       arguments: { url: 'http://169.254.169.254/' },
     });
     expect(unsafe.isError).toBe(true);
@@ -65,10 +65,10 @@ describe('official MCP protocol', () => {
       .fn<typeof globalThis.fetch>()
       .mockImplementation(async () => new Response('test-secret', { status: 401 }));
     const client = await connect(
-      new WebPulse({ http: { fetch }, env: { GITHUB_TOKEN: 'test-secret' } }),
+      new WebWire({ http: { fetch }, env: { GITHUB_TOKEN: 'test-secret' } }),
     );
     const result = await client.callTool({
-      name: 'webpulse_github_repository',
+      name: 'webwire_github_repository',
       arguments: { owner: 'octocat', repo: 'Hello-World' },
     });
     expect(result.isError).toBe(true);
@@ -76,17 +76,17 @@ describe('official MCP protocol', () => {
     expect(result.structuredContent).toMatchObject({ error: { code: 'AUTHENTICATION' } });
   });
   it('hides disabled channels and exposes scoped doctor results', async () => {
-    const client = await connect(new WebPulse({ enabledChannels: [] }));
-    expect((await client.listTools()).tools.map((tool) => tool.name)).toEqual(['webpulse_doctor']);
+    const client = await connect(new WebWire({ enabledChannels: [] }));
+    expect((await client.listTools()).tools.map((tool) => tool.name)).toEqual(['webwire_doctor']);
     const result = await client.callTool({
-      name: 'webpulse_doctor',
+      name: 'webwire_doctor',
       arguments: { channels: ['web'] },
     });
     expect(result.structuredContent).toMatchObject({
       data: [{ channel: 'web', backends: [{ status: 'disabled' }] }],
     });
     const unknown = await client.callTool({
-      name: 'webpulse_doctor',
+      name: 'webwire_doctor',
       arguments: { channels: ['missing'] },
     });
     expect(unknown.isError).toBe(true);

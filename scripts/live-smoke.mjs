@@ -1,7 +1,7 @@
-import { WebPulse } from '../dist/index.js';
+import { WebWire } from '../dist/index.js';
 
 // Only public credential-free checks; no paid services are contacted implicitly.
-const pulse = new WebPulse({ timeout: 20000, retries: 0, env: {} });
+const pulse = new WebWire({ timeout: 20000, retries: 0, env: {} });
 // Opt in to consuming Exa's keyless search quota with --search.
 const report = await pulse.doctor({
   channels: [

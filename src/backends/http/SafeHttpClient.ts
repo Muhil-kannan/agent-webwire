@@ -3,7 +3,7 @@ import {
   AuthenticationError,
   NetworkError,
   RateLimitError,
-  WebPulseError,
+  WebWireError,
 } from '../../core/errors.js';
 import { abortable, abortError } from '../../core/BackendManager.js';
 import { publicUrl, resolvePublic, type Resolver } from '../../security/url.js';
@@ -44,7 +44,7 @@ export function retryAfter(headers: Headers): number | undefined {
 export async function boundedText(response: Response, maxBytes: number): Promise<string> {
   if (Number(response.headers.get('content-length')) > maxBytes) {
     await response.body?.cancel();
-    throw new WebPulseError(
+    throw new WebWireError(
       'RESPONSE_TOO_LARGE',
       'The response exceeded the configured size limit.',
     );
@@ -59,7 +59,7 @@ export async function boundedText(response: Response, maxBytes: number): Promise
       if (done) break;
       size += value.byteLength;
       if (size > maxBytes)
-        throw new WebPulseError(
+        throw new WebWireError(
           'RESPONSE_TOO_LARGE',
           'The response exceeded the configured size limit.',
         );
@@ -87,7 +87,7 @@ export class SafeHttpClient {
       this.maxBytes < 1 ||
       this.maxBytes > 20 * 1024 * 1024
     )
-      throw new WebPulseError('CONFIGURATION', 'Invalid HTTP timeout or response size limit.');
+      throw new WebWireError('CONFIGURATION', 'Invalid HTTP timeout or response size limit.');
   }
   async request(input: string, options: RequestOptions = {}): Promise<HttpResponse> {
     const signal = AbortSignal.any([
@@ -112,7 +112,7 @@ export class SafeHttpClient {
       },
     });
     const headers = new Headers({
-      'user-agent': 'web-pulse/0.1.0',
+      'user-agent': 'agent-webwire/0.1.0',
       accept: 'application/json, text/html;q=0.9, */*;q=0.8',
       ...options.headers,
     });
@@ -141,7 +141,7 @@ export class SafeHttpClient {
               });
             const target = publicUrl(new URL(location, url).href);
             if (url.protocol === 'https:' && target.protocol !== 'https:')
-              throw new WebPulseError('UNSAFE_URL', 'HTTPS redirects must not downgrade to HTTP.');
+              throw new WebWireError('UNSAFE_URL', 'HTTPS redirects must not downgrade to HTTP.');
             if (options.method === 'POST')
               throw new NetworkError('Redirecting API POST requests is unsupported.', {
                 recoverable: false,
@@ -166,7 +166,7 @@ export class SafeHttpClient {
             throw new RateLimitError(undefined, { retryAfterMs: retryAfter(response.headers) });
           if ([401, 403].includes(response.status)) throw new AuthenticationError();
           if (response.status === 404)
-            throw new WebPulseError('NOT_FOUND', 'The requested resource was not found.');
+            throw new WebWireError('NOT_FOUND', 'The requested resource was not found.');
           if (!response.ok)
             throw new NetworkError(`Provider returned HTTP ${response.status}.`, {
               recoverable: response.status >= 500,
@@ -177,7 +177,7 @@ export class SafeHttpClient {
       }, signal);
     } catch (error) {
       if (signal.aborted) throw abortError(signal);
-      if (error instanceof WebPulseError) throw error;
+      if (error instanceof WebWireError) throw error;
       // Do not echo native fetch errors, URLs, headers, DNS data or response bodies.
       throw new NetworkError();
     } finally {
@@ -190,11 +190,11 @@ export class SafeHttpClient {
     try {
       value = JSON.parse(response.text);
     } catch {
-      throw new WebPulseError('INVALID_RESPONSE', 'The provider did not return valid JSON.');
+      throw new WebWireError('INVALID_RESPONSE', 'The provider did not return valid JSON.');
     }
     const result = schema.safeParse(value);
     if (!result.success)
-      throw new WebPulseError(
+      throw new WebWireError(
         'INVALID_RESPONSE',
         'The provider returned an unexpected response schema.',
       );

@@ -11,7 +11,7 @@ import {
   BackendUnavailableError,
   NetworkError,
   RateLimitError,
-  WebPulseError,
+  WebWireError,
 } from '../../core/errors.js';
 import { abortError } from '../../core/BackendManager.js';
 
@@ -30,7 +30,7 @@ export const searchResponseSchema = z.object({
   untrusted: z.literal(true),
 });
 const invalidResponse = () =>
-  new WebPulseError('INVALID_RESPONSE', 'Exa MCP returned an unsupported search response.');
+  new WebWireError('INVALID_RESPONSE', 'Exa MCP returned an unsupported search response.');
 
 /** Both official Exa response forms are supported: structured JSON and labeled text. */
 export function normalizeExaResult(
@@ -111,7 +111,7 @@ export async function searchExaMcp(
   limit: number,
   signal: AbortSignal,
 ) {
-  const client = new Client({ name: 'webpulse', version: '0.1.0' });
+  const client = new Client({ name: 'webwire', version: '0.1.0' });
   const transport = new StreamableHTTPClientTransport(endpoint, {
     // The core backend manager owns retries, not the protocol transport.
     reconnectionOptions: {
@@ -123,7 +123,7 @@ export async function searchExaMcp(
     fetch: async (input, init = {}) => {
       const target = new URL(input);
       if (target.href !== endpoint.href || !['GET', 'POST'].includes(init.method ?? 'GET'))
-        throw new WebPulseError(
+        throw new WebWireError(
           'UNSAFE_URL',
           'The Exa MCP backend only contacts its fixed public endpoint.',
         );
@@ -160,7 +160,7 @@ export async function searchExaMcp(
     return normalizeExaResult(result, limit);
   } catch (error) {
     if (signal.aborted) throw abortError(signal);
-    if (error instanceof WebPulseError) throw error;
+    if (error instanceof WebWireError) throw error;
     if (error instanceof SyntaxError || error instanceof z.ZodError) throw invalidResponse();
     if (error instanceof McpError || error instanceof StreamableHTTPError)
       throw new BackendUnavailableError('The Exa MCP protocol request failed.', {

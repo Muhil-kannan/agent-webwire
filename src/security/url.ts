@@ -1,10 +1,10 @@
 import { lookup } from 'node:dns/promises';
 import { isIP } from 'node:net';
 import ipaddr from 'ipaddr.js';
-import { WebPulseError } from '../core/errors.js';
+import { WebWireError } from '../core/errors.js';
 
 const unsafe = () =>
-  new WebPulseError('UNSAFE_URL', 'Only public HTTP(S) URLs on standard ports are allowed.');
+  new WebWireError('UNSAFE_URL', 'Only public HTTP(S) URLs on standard ports are allowed.');
 const blockedV4 = [
   '0.0.0.0/8',
   '10.0.0.0/8',

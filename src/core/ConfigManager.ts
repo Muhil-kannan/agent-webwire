@@ -20,7 +20,7 @@ export function parseConfig(value: unknown): Config {
   const result = configSchema.safeParse(value);
   if (!result.success)
     throw new ConfigurationError(
-      'Invalid WebPulse settings. Secrets belong in environment variables; auth values must be environment variable names.',
+      'Invalid WebWire settings. Secrets belong in environment variables; auth values must be environment variable names.',
     );
   return result.data;
 }
@@ -29,11 +29,10 @@ export function configDirectory(
   env = process.env,
   home = homedir(),
 ): string {
-  if (env.WEBPULSE_CONFIG_DIR) return resolve(env.WEBPULSE_CONFIG_DIR);
-  if (platform === 'win32')
-    return join(env.APPDATA || join(home, 'AppData', 'Roaming'), 'webpulse');
-  if (platform === 'darwin') return join(home, 'Library', 'Application Support', 'webpulse');
-  return join(env.XDG_CONFIG_HOME || join(home, '.config'), 'webpulse');
+  if (env.WEBWIRE_CONFIG_DIR) return resolve(env.WEBWIRE_CONFIG_DIR);
+  if (platform === 'win32') return join(env.APPDATA || join(home, 'AppData', 'Roaming'), 'webwire');
+  if (platform === 'darwin') return join(home, 'Library', 'Application Support', 'webwire');
+  return join(env.XDG_CONFIG_HOME || join(home, '.config'), 'webwire');
 }
 async function rejectSymlinks(path: string): Promise<void> {
   const absolute = resolve(path);
@@ -71,7 +70,7 @@ export class ConfigManager {
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === 'ENOENT') return parseConfig({});
       if (error instanceof ConfigurationError) throw error;
-      throw new ConfigurationError('Could not safely read WebPulse configuration.');
+      throw new ConfigurationError('Could not safely read WebWire configuration.');
     }
   }
   async save(input: ConfigInput): Promise<void> {
@@ -92,7 +91,7 @@ export class ConfigManager {
       await rename(temporary, this.path);
     } catch (error) {
       if (error instanceof ConfigurationError) throw error;
-      throw new ConfigurationError('Could not safely write WebPulse configuration.');
+      throw new ConfigurationError('Could not safely write WebWire configuration.');
     } finally {
       if (temporary)
         await unlink(temporary).catch((error: NodeJS.ErrnoException) => {

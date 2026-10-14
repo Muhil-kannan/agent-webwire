@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { Backend, BackendContext, Operation, WebPulseChannel } from '../core/types.js';
+import type { Backend, BackendContext, Operation, WebWireChannel } from '../core/types.js';
 import { health } from '../core/types.js';
 import { AuthenticationError } from '../core/errors.js';
 import type { Redactor } from '../security/redact.js';
@@ -53,7 +53,7 @@ export function apiChannel(
   probe: (context: BackendContext) => Promise<unknown>,
   scope: string,
   available: () => boolean = () => true,
-): WebPulseChannel {
+): WebWireChannel {
   return {
     id,
     name,
@@ -71,7 +71,7 @@ export function apiChannel(
               'configuration_required',
               'Required environment credentials are missing.',
               scope,
-              'See docs/AUTHENTICATION.md and webpulse configure.',
+              'See docs/AUTHENTICATION.md and webwire configure.',
             );
           await probe(context);
           return health('ready', 'Read probe succeeded.', scope);

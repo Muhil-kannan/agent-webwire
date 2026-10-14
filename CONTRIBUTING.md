@@ -10,7 +10,7 @@ Document credential grants, API permissions, pagination and limitations. Mark
 unsupported behavior explicitly. Do not add cookie import, challenge evasion,
 shell interpolation, unlimited downloads or implicit credential fallback.
 
-Use `WebPulseOptions.channels` for plugin channels. Plugin code and custom fetch
+Use `WebWireOptions.channels` for plugin channels. Plugin code and custom fetch
 implementations are trusted code. The core enforces deadlines and validation,
 but cannot undo side effects of a plugin that ignores cancellation.
 

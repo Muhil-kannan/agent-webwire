@@ -50,7 +50,7 @@ export function createRedditChannel({ http, credentials }: ChannelDependencies) 
       signal,
       headers: {
         authorization: `Bearer ${credentials.require('reddit', 'REDDIT_ACCESS_TOKEN')}`,
-        'user-agent': 'node:web-pulse:0.1.0 (read-only SDK; user-supplied approved OAuth)',
+        'user-agent': 'node:agent-webwire:0.1.0 (read-only SDK; user-supplied approved OAuth)',
       },
     });
   return apiChannel(
@@ -63,8 +63,8 @@ export function createRedditChannel({ http, credentials }: ChannelDependencies) 
         const result = await request(`/api/info?id=t3_${id}&raw_json=1`, listingSchema, signal);
         const item = result.data.children[0]?.data;
         if (!item) {
-          const { WebPulseError } = await import('../../core/errors.js');
-          throw new WebPulseError('NOT_FOUND', 'The Reddit post is unavailable.');
+          const { WebWireError } = await import('../../core/errors.js');
+          throw new WebWireError('NOT_FOUND', 'The Reddit post is unavailable.');
         }
         return item;
       }

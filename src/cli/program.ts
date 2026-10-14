@@ -1,6 +1,6 @@
 import { Command, CommanderError, InvalidArgumentError } from 'commander';
 import { createInterface } from 'node:readline/promises';
-import { WebPulse } from '../core/WebPulse.js';
+import { WebWire } from '../core/WebWire.js';
 import { ConfigManager, parseConfig } from '../core/ConfigManager.js';
 import { ConfigurationError, publicError } from '../core/errors.js';
 import { DependencyManager } from '../core/DependencyManager.js';
@@ -27,9 +27,9 @@ const authServices = [
   'linkedin',
 ];
 
-export function createProgram(io: CliIO = defaultIO, supplied?: WebPulse) {
+export function createProgram(io: CliIO = defaultIO, supplied?: WebWire) {
   const program = new Command()
-    .name('webpulse')
+    .name('webwire')
     .description('Connect AI Agents to the Web.')
     .version('0.1.0')
     .option('--json', 'Print machine-readable JSON; errors also use JSON')
@@ -37,7 +37,7 @@ export function createProgram(io: CliIO = defaultIO, supplied?: WebPulse) {
     .exitOverride()
     .configureOutput({ writeOut: io.out, writeErr: io.err, outputError: () => {} });
   const manager = () => new ConfigManager(program.opts<{ configDir?: string }>().configDir);
-  const pulse = async () => supplied ?? WebPulse.fromConfig(manager());
+  const pulse = async () => supplied ?? WebWire.fromConfig(manager());
   const output = (value: unknown) =>
     io.out(JSON.stringify(value, null, program.opts().json ? undefined : 2));
   const command = (parent: Command, signature: string, description: string) =>
@@ -53,7 +53,7 @@ export function createProgram(io: CliIO = defaultIO, supplied?: WebPulse) {
       ).doctor({ channels: options.channel ? [options.channel] : undefined });
       if (program.opts().json) output(results);
       else {
-        io.out('WebPulse Diagnostics');
+        io.out('WebWire Diagnostics');
         io.out(`Platform: ${process.platform} | Node ${process.version}`);
         for (const result of results) {
           io.out(`\n${result.name} (${result.capabilities.join(', ')})`);
@@ -86,7 +86,7 @@ export function createProgram(io: CliIO = defaultIO, supplied?: WebPulse) {
         node,
         systemChanges: [],
         externalToolsRequired: [],
-        nextSteps: ['webpulse channels list', 'webpulse configure', 'webpulse doctor'],
+        nextSteps: ['webwire channels list', 'webwire configure', 'webwire doctor'],
       });
       if (node.status !== 'ready') process.exitCode = 1;
     });
@@ -161,7 +161,7 @@ export function createProgram(io: CliIO = defaultIO, supplied?: WebPulse) {
           config.preferredBackends[parts[0]] = parts[1];
         }
         // Validate channel/backend references before writing anything.
-        new WebPulse(parseConfig(config));
+        new WebWire(parseConfig(config));
         await store.save(config);
         output({
           path: store.path,
@@ -296,7 +296,7 @@ export function createProgram(io: CliIO = defaultIO, supplied?: WebPulse) {
   );
   return program;
 }
-export async function runCli(args = process.argv, io: CliIO = defaultIO, supplied?: WebPulse) {
+export async function runCli(args = process.argv, io: CliIO = defaultIO, supplied?: WebWire) {
   try {
     await createProgram(io, supplied).parseAsync(args);
   } catch (error) {
@@ -304,7 +304,7 @@ export async function runCli(args = process.argv, io: CliIO = defaultIO, supplie
       if (error.exitCode === 0) return;
       io.err(
         JSON.stringify({
-          error: { code: 'VALIDATION', message: 'Invalid CLI arguments. Run webpulse --help.' },
+          error: { code: 'VALIDATION', message: 'Invalid CLI arguments. Run webwire --help.' },
         }),
       );
       process.exitCode = 2;

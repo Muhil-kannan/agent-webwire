@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, expectTypeOf } from 'vitest';
-import { WebPulse, ConfigManager } from '../../src/index.js';
+import { WebWire, ConfigManager } from '../../src/index.js';
 import { parseFeed } from '../../src/channels/rss/index.js';
 import { videoId, parseVtt } from '../../src/channels/youtube/index.js';
 import {
@@ -74,7 +74,7 @@ function setup(env: NodeJS.ProcessEnv = {}) {
     }
     throw new Error('Unexpected request');
   });
-  return { pulse: new WebPulse({ http: { fetch }, env, retries: 0 }), fetch };
+  return { pulse: new WebWire({ http: { fetch }, env, retries: 0 }), fetch };
 }
 describe('core SDK operations', () => {
   it('extracts title, metadata, text and Markdown without executing scripts', async () => {
@@ -231,7 +231,7 @@ describe('core SDK operations', () => {
       preferredBackends: {},
     });
     const { fetch } = setup();
-    const pulse = await WebPulse.fromConfig(store, {
+    const pulse = await WebWire.fromConfig(store, {
       env: { CUSTOM_GH: 'custom-token' },
       http: { fetch },
     });
@@ -240,9 +240,9 @@ describe('core SDK operations', () => {
     expect(new Headers(fetch.mock.calls[0]?.[1]?.headers).get('authorization')).toBe(
       'Bearer custom-token',
     );
-    expect(() => new WebPulse({ enabledChannels: ['missing'] })).toThrow();
-    expect(() => new WebPulse({ preferredBackends: { web: 'unknown' } })).toThrow();
-    const disabled = new WebPulse({ enabledChannels: [] });
+    expect(() => new WebWire({ enabledChannels: ['missing'] })).toThrow();
+    expect(() => new WebWire({ preferredBackends: { web: 'unknown' } })).toThrow();
+    const disabled = new WebWire({ enabledChannels: [] });
     await expect(disabled.web.read('https://example.com')).rejects.toMatchObject({
       code: 'CHANNEL_UNAVAILABLE',
     });
@@ -260,18 +260,18 @@ describe('core SDK operations', () => {
     );
     const missing = await setup().pulse.doctor({ channels: ['youtube'] });
     expect(missing[0]?.backends[0]?.status).toBe('configuration_required');
-    const disabled = new WebPulse({ enabledChannels: [] });
+    const disabled = new WebWire({ enabledChannels: [] });
     expect((await disabled.doctor({ channels: ['web'] }))[0]?.backends[0]?.status).toBe('disabled');
     const fetch = vi
       .fn<typeof globalThis.fetch>()
       .mockImplementation(async () => new Response('', { status: 401 }));
     expect(
-      (await new WebPulse({ http: { fetch } }).doctor({ channels: ['web'] }))[0]?.backends[0]
+      (await new WebWire({ http: { fetch } }).doctor({ channels: ['web'] }))[0]?.backends[0]
         ?.status,
     ).toBe('configuration_required');
     fetch.mockRejectedValue(new Error('secret raw failure'));
     expect(
-      (await new WebPulse({ http: { fetch } }).doctor({ channels: ['web'] }))[0]?.backends[0]
+      (await new WebWire({ http: { fetch } }).doctor({ channels: ['web'] }))[0]?.backends[0]
         ?.status,
     ).toBe('unavailable');
   });

@@ -9,7 +9,7 @@ import { CapabilityManager } from './CapabilityManager.js';
 import { ConfigManager, parseConfig, type ConfigInput, type Config } from './ConfigManager.js';
 import { HealthChecker } from './HealthChecker.js';
 import { ChannelUnavailableError, ValidationError, publicError } from './errors.js';
-import type { ExecuteOptions, DiagnosticEvent, WebPulseChannel } from './types.js';
+import type { ExecuteOptions, DiagnosticEvent, WebWireChannel } from './types.js';
 
 export type BuiltinChannel = keyof typeof builtinOperations;
 export type BuiltinOperation<C extends BuiltinChannel> = keyof (typeof builtinOperations)[C] &
@@ -24,12 +24,12 @@ export type OperationOutput<C extends BuiltinChannel, O extends BuiltinOperation
 >;
 type PageOptions = { page?: number; limit?: number };
 type StateOptions = PageOptions & { state?: 'open' | 'closed' | 'all' };
-export interface WebPulseOptions extends ConfigInput {
+export interface WebWireOptions extends ConfigInput {
   http?: HttpOptions;
   env?: NodeJS.ProcessEnv;
-  channels?: WebPulseChannel[];
+  channels?: WebWireChannel[];
 }
-export class WebPulse {
+export class WebWire {
   readonly registry = new ChannelRegistry();
   readonly capabilities = new CapabilityManager(this.registry);
   readonly config: Config;
@@ -37,7 +37,7 @@ export class WebPulse {
   private readonly manager: BackendManager;
   private readonly checker: HealthChecker;
   private readonly events: DiagnosticEvent[] = [];
-  constructor(options: WebPulseOptions = {}) {
+  constructor(options: WebWireOptions = {}) {
     const { http: httpOptions, env, channels = [], ...settings } = options;
     this.config = parseConfig(settings);
     const http = new SafeHttpClient({
@@ -62,9 +62,9 @@ export class WebPulse {
     }
     this.checker = new HealthChecker(this.registry, this.config);
   }
-  static async fromConfig(manager = new ConfigManager(), overrides: WebPulseOptions = {}) {
+  static async fromConfig(manager = new ConfigManager(), overrides: WebWireOptions = {}) {
     const config = await manager.load();
-    return new WebPulse({
+    return new WebWire({
       ...config,
       ...overrides,
       auth: { ...config.auth, ...overrides.auth },

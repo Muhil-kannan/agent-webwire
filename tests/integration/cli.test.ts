@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { runCli } from '../../src/cli/program.js';
-import { WebPulse } from '../../src/index.js';
+import { WebWire } from '../../src/index.js';
 import { repository, html } from '../fixtures/data.js';
 
 const directories: string[] = [];
@@ -12,12 +12,12 @@ afterEach(async () => {
   process.exitCode = oldExitCode;
   for (const dir of directories.splice(0)) await rm(dir, { recursive: true, force: true });
 });
-async function cli(args: string[], pulse?: WebPulse) {
+async function cli(args: string[], pulse?: WebWire) {
   const out: string[] = [];
   const err: string[] = [];
   process.exitCode = 0;
   await runCli(
-    ['node', 'webpulse', ...args],
+    ['node', 'webwire', ...args],
     { out: (s) => out.push(s), err: (s) => err.push(s) },
     pulse,
   );
@@ -27,7 +27,7 @@ describe('CLI behavior', () => {
   it('prints real help/version and machine-readable discovery', async () => {
     expect((await cli(['--help'])).out).toContain('doctor');
     expect((await cli(['--version'])).out).toContain('0.1.0');
-    const result = await cli(['channels', 'list', '--json'], new WebPulse({ env: {} }));
+    const result = await cli(['channels', 'list', '--json'], new WebWire({ env: {} }));
     expect(JSON.parse(result.out)).toContainEqual(
       expect.objectContaining({ channel: 'web', operation: 'read' }),
     );
@@ -42,7 +42,7 @@ describe('CLI behavior', () => {
           ? Response.json({ items: [repository], total_count: 1 })
           : new Response(html, { headers: { 'content-type': 'text/html' } }),
       );
-    const pulse = new WebPulse({ env: {}, http: { fetch } });
+    const pulse = new WebWire({ env: {}, http: { fetch } });
     const search = await cli(
       ['github', 'search', 'typescript', '--page', '2', '--limit', '3', '--json'],
       pulse,
@@ -58,7 +58,7 @@ describe('CLI behavior', () => {
     expect(invalid.code).toBe(1);
   });
   it('reports unavailable credentials, invalid arguments and malformed generic JSON', async () => {
-    const pulse = new WebPulse({ env: {} });
+    const pulse = new WebWire({ env: {} });
     const missing = await cli(['youtube', 'search', 'AI', '--json'], pulse);
     expect(JSON.parse(missing.err).error.code).toBe('BACKEND_UNAVAILABLE');
     expect(missing.code).toBe(1);
@@ -70,7 +70,7 @@ describe('CLI behavior', () => {
     expect(JSON.parse(malformed.err).error.code).toBe('CONFIGURATION');
   });
   it('performs a safe environment check and does not create config files', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'webpulse-cli-test-'));
+    const dir = await mkdtemp(join(tmpdir(), 'webwire-cli-test-'));
     directories.push(dir);
     const result = await cli(['--config-dir', dir, 'install', '--dry-run', '--json']);
     expect(JSON.parse(result.out)).toMatchObject({
@@ -82,7 +82,7 @@ describe('CLI behavior', () => {
     await expect(readFile(join(dir, 'config.json'))).rejects.toMatchObject({ code: 'ENOENT' });
   });
   it('configures references safely and rejects invalid changes before writes', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'webpulse-cli-config-'));
+    const dir = await mkdtemp(join(tmpdir(), 'webwire-cli-config-'));
     directories.push(dir);
     const args = ['--config-dir', dir];
     expect(
@@ -116,13 +116,13 @@ describe('CLI behavior', () => {
   it('uses truthful doctor statuses and nonzero exit codes for unavailable channels', async () => {
     const missing = await cli(
       ['doctor', '--channel', 'youtube', '--json'],
-      new WebPulse({ env: {} }),
+      new WebWire({ env: {} }),
     );
     expect(JSON.parse(missing.out)[0].backends[0].status).toBe('configuration_required');
     expect(missing.code).toBe(1);
     const disabled = await cli(
       ['doctor', '--channel', 'web'],
-      new WebPulse({ enabledChannels: [] }),
+      new WebWire({ enabledChannels: [] }),
     );
     expect(disabled.out).toContain('DISABLED');
     expect(disabled.code).toBe(0);

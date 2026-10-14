@@ -6,7 +6,7 @@ import { ConfigManager, configDirectory, parseConfig } from '../../src/core/Conf
 
 const temporary: string[] = [];
 async function directory() {
-  const path = await mkdtemp(join(tmpdir(), 'webpulse-config-test-'));
+  const path = await mkdtemp(join(tmpdir(), 'webwire-config-test-'));
   temporary.push(path);
   return path;
 }
@@ -45,15 +45,15 @@ describe('safe configuration', () => {
       { retries: 9 },
       { timeout: '100' },
     ])
-      expect(() => parseConfig(value)).toThrow('Invalid WebPulse settings');
+      expect(() => parseConfig(value)).toThrow('Invalid WebWire settings');
   });
   it('resolves platform paths and explicit overrides', () => {
-    expect(configDirectory('win32', { APPDATA: 'R:/Roaming' }, 'H:/User')).toContain('webpulse');
+    expect(configDirectory('win32', { APPDATA: 'R:/Roaming' }, 'H:/User')).toContain('webwire');
     expect(configDirectory('win32', {}, 'H:/User')).toContain('AppData');
     expect(configDirectory('darwin', {}, '/Users/test')).toContain('Application Support');
     expect(configDirectory('linux', { XDG_CONFIG_HOME: '/config' }, '/home/u')).toContain('config');
     expect(configDirectory('linux', {}, '/home/u')).toContain('.config');
-    expect(configDirectory('linux', { WEBPULSE_CONFIG_DIR: '/custom' }, '/home/u')).toContain(
+    expect(configDirectory('linux', { WEBWIRE_CONFIG_DIR: '/custom' }, '/home/u')).toContain(
       'custom',
     );
   });

@@ -6,7 +6,7 @@ import {
   pageInput,
   type ChannelDependencies,
 } from '../shared.js';
-import { WebPulseError } from '../../core/errors.js';
+import { WebWireError } from '../../core/errors.js';
 
 const memberSchema = z.object({
   id: z.number(),
@@ -83,7 +83,7 @@ export function createV2exChannel({ http }: ChannelDependencies) {
       }
       const p = v2exOperations.getTopic.input.parse(raw);
       const items = await request(`/topics/show.json?id=${p.id}`, z.array(topicSchema), signal);
-      if (!items[0]) throw new WebPulseError('NOT_FOUND', 'The V2EX topic was not found.');
+      if (!items[0]) throw new WebWireError('NOT_FOUND', 'The V2EX topic was not found.');
       const replies = await request(
         `/replies/show.json?topic_id=${p.id}&page=${p.page}`,
         z.array(replySchema),

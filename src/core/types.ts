@@ -28,7 +28,7 @@ export interface Backend {
   checkHealth(context: BackendContext): Promise<HealthStatus>;
   execute(operation: string, params: unknown, context: BackendContext): Promise<unknown>;
 }
-export interface WebPulseChannel {
+export interface WebWireChannel {
   id: string;
   name: string;
   operations: Readonly<Record<string, Operation>>;

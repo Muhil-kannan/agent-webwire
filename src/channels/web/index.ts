@@ -3,7 +3,7 @@ import { Readability } from '@mozilla/readability';
 import { parseHTML } from 'linkedom';
 import TurndownService from 'turndown';
 import { apiChannel, operation, urlInput, type ChannelDependencies } from '../shared.js';
-import { WebPulseError } from '../../core/errors.js';
+import { WebWireError } from '../../core/errors.js';
 
 export const webPageSchema = z.object({
   url: z.string(),
@@ -68,7 +68,7 @@ export function extractPage(html: string, url: string, format: 'text' | 'markdow
     .replace(/\n\s*\n/g, '\n\n')
     .trim();
   if (!text)
-    throw new WebPulseError(
+    throw new WebWireError(
       'INVALID_RESPONSE',
       'No readable page content was found. JavaScript rendering and challenge solving are unsupported.',
     );
@@ -91,7 +91,7 @@ export function createWebChannel({ http }: ChannelDependencies) {
     });
     const type = response.headers.get('content-type')?.split(';')[0]?.trim();
     if (type === 'text/plain') {
-      if (!response.text.trim()) throw new WebPulseError('INVALID_RESPONSE', 'The page was empty.');
+      if (!response.text.trim()) throw new WebWireError('INVALID_RESPONSE', 'The page was empty.');
       return {
         url: response.url,
         title: '',
@@ -104,7 +104,7 @@ export function createWebChannel({ http }: ChannelDependencies) {
       };
     }
     if (type && !['text/html', 'application/xhtml+xml'].includes(type))
-      throw new WebPulseError(
+      throw new WebWireError(
         'INVALID_RESPONSE',
         'The website reader supports HTML and plain text.',
       );
@@ -113,7 +113,7 @@ export function createWebChannel({ http }: ChannelDependencies) {
         response.text,
       )
     )
-      throw new WebPulseError(
+      throw new WebWireError(
         'BACKEND_UNAVAILABLE',
         'The site returned an access challenge. Use an authorized site API or obtain content from its owner.',
       );

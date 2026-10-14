@@ -1,6 +1,6 @@
 # Third-party notices
 
-WebPulse is MIT licensed. Dependencies retain their own licenses and notices.
+WebWire is MIT licensed. Dependencies retain their own licenses and notices.
 
 Runtime dependency licenses (the installed dependency files are authoritative):
 
@@ -17,6 +17,6 @@ Runtime dependency licenses (the installed dependency files are authoritative):
 | zod                       | MIT        | Request and response validation             |
 
 Dependencies are installed separately by npm with their original license and
-notice files. WebPulse does not relicense dependency code. Source maps contain
-WebPulse's own source; dependency code is external to its bundles. Keep dependency
+notice files. WebWire does not relicense dependency code. Source maps contain
+WebWire's own source; dependency code is external to its bundles. Keep dependency
 licenses and notices when redistributing a complete installation.

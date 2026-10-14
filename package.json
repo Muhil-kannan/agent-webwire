@@ -1,16 +1,16 @@
 {
-  "name": "web-pulse",
+  "name": "agent-webwire",
   "version": "0.1.0",
   "description": "Connect AI Agents to the Web. Typed SDK, CLI and MCP tools for public web access.",
   "type": "module",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Muhil-kannan/web-pulse.git"
+    "url": "git+https://github.com/Muhil-kannan/agent-webwire.git"
   },
-  "homepage": "https://github.com/Muhil-kannan/web-pulse#readme",
+  "homepage": "https://github.com/Muhil-kannan/agent-webwire#readme",
   "bugs": {
-    "url": "https://github.com/Muhil-kannan/web-pulse/issues"
+    "url": "https://github.com/Muhil-kannan/agent-webwire/issues"
   },
   "engines": {
     "node": ">=22.16.0"
@@ -41,7 +41,7 @@
     }
   },
   "bin": {
-    "webpulse": "./dist/cli/index.js"
+    "webwire": "dist/cli/index.js"
   },
   "files": [
     "dist",
@@ -103,5 +103,9 @@
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.71.2",
     "vitest": "^5.0.4"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   }
 }

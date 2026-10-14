@@ -8,9 +8,9 @@ import {
   AuthenticationError,
   NetworkError,
   RateLimitError,
-  WebPulseError,
+  WebWireError,
 } from '../../src/core/errors.js';
-import { health, type Backend, type WebPulseChannel } from '../../src/core/types.js';
+import { health, type Backend, type WebWireChannel } from '../../src/core/types.js';
 
 const spec = {
   input: z.strictObject({ query: z.string().min(1) }),
@@ -28,7 +28,7 @@ function backend(id: string, execute: Backend['execute']): Backend {
     execute: vi.fn(execute),
   };
 }
-const channel = (...backends: Backend[]): WebPulseChannel => ({
+const channel = (...backends: Backend[]): WebWireChannel => ({
   id: 'sample',
   name: 'Sample',
   operations: { read: spec },
@@ -142,7 +142,7 @@ describe('routing foundation', () => {
   it.each([
     new AuthenticationError(),
     new RateLimitError(),
-    new WebPulseError('INVALID_RESPONSE', 'bad'),
+    new WebWireError('INVALID_RESPONSE', 'bad'),
     new NetworkError('permanent', { recoverable: false }),
   ])('stops on permanent or credential/quota failures', async (error) => {
     const first = backend('first', async () => {

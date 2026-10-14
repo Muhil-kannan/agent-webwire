@@ -1,7 +1,7 @@
 {
   "mcpServers": {
-    "webpulse": {
-      "command": "webpulse",
+    "webwire": {
+      "command": "webwire",
       "args": ["mcp", "start"]
     }
   }
