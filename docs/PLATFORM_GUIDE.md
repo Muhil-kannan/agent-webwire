@@ -6,7 +6,7 @@ and quotas. WebWire does not issue tokens or refresh OAuth credentials.
 
 ## Start here
 
-Use Node.js 22.16 or newer. After publication, install the CLI with:
+Use Node.js 22.16 or newer. Install the CLI with:
 
 ```bash
 npm install -g agent-webwire
@@ -269,7 +269,7 @@ integration would require separate implementation and appropriate provider acces
 
 ## Use the same credentials in the SDK or MCP
 
-Install the SDK with `npm install agent-webwire` after publication. Environment
+Install the SDK with `npm install agent-webwire`. Environment
 credentials work with the SDK as well as the CLI:
 
 ```javascript
